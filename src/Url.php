@@ -6,6 +6,7 @@ namespace Baraja\Url;
 
 
 use Nette\Http\Url as NetteUrl;
+use Nette\Http\UrlScript;
 
 final class Url
 {
@@ -14,6 +15,8 @@ final class Url
 	private string $baseUrl;
 
 	private NetteUrl $netteUrl;
+
+	private UrlScript $urlScript;
 
 
 	public function __construct(?string $currentUrl = null)
@@ -27,7 +30,8 @@ final class Url
 		}
 		$this->currentUrl = $currentUrl ?? $this->detectCurrentUrl();
 		$this->netteUrl = new NetteUrl($this->currentUrl);
-		$this->baseUrl = rtrim($this->netteUrl->getBaseUrl(), '/');
+		$this->urlScript = new UrlScript($this->netteUrl, $this->getScriptPath($this->netteUrl));
+		$this->baseUrl = rtrim($this->urlScript->getBaseUrl(), '/');
 	}
 
 
@@ -57,10 +61,12 @@ final class Url
 	}
 
 
-	/**
-	 * Return current absolute URL.
-	 * Return null, if current URL does not exist (for example in CLI mode).
-	 */
+	public function getUrlScript(): UrlScript
+	{
+		return $this->urlScript;
+	}
+
+
 	private function detectCurrentUrl(): string
 	{
 		if (!isset($_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'])) {
@@ -69,5 +75,21 @@ final class Url
 
 		return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
 			. '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+	}
+
+
+	private function getScriptPath(NetteUrl $url): string
+	{
+		if (($lowerPath = strtolower($path = $url->getPath())) !== ($script = strtolower($_SERVER['SCRIPT_NAME'] ?? ''))) {
+			$max = min(strlen($lowerPath), strlen($script));
+			for ($i = 0; $i < $max && $lowerPath[$i] === $script[$i]; $i++) {
+				continue;
+			}
+			$path = $i
+				? substr($path, 0, strrpos($path, '/', $i - strlen($path) - 1) + 1)
+				: '/';
+		}
+
+		return $path;
 	}
 }
