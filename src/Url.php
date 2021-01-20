@@ -20,8 +20,9 @@ final class Url
 	{
 		if (PHP_SAPI === 'cli' && $currentUrl === null) {
 			throw new \RuntimeException(
-				'URL detection and work is not available in CLI mode, but only when processing a real request.' . "\n"
-				. 'You can suppress this message by passing an absolute URL in the parameter.'
+				'URL detection is not available in CLI mode, but only when processing a real request.' . "\n"
+				. 'To solve this issue: BaseUrl is automatically detected according to the current HTTP request. '
+				. 'In CLI mode (when there is no HTTP request), you need to manually define the BaseUrl by passing an absolute URL in the parameter.'
 			);
 		}
 		$this->currentUrl = $currentUrl ?? $this->detectCurrentUrl();
