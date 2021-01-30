@@ -1,9 +1,9 @@
-Baraja URL
-==========
+Baraja safe URL
+===============
 
 ![Integrity check](https://github.com/baraja-core/url/workflows/Integrity%20check/badge.svg)
 
-Simple URL manager.
+Simple manager to get parts of the current URL. URL resolving is done in a secure way.
 
 📄 License
 -----------
