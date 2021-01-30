@@ -48,7 +48,7 @@ final class Url
 
 	public static function addAllowedDomain(string $domain): void
 	{
-		$domain = strtolower($domain);
+		$domain = self::idnHostToUnicode(strtolower($domain));
 		self::$allowedDomains[$domain] = $domain;
 	}
 
@@ -59,6 +59,23 @@ final class Url
 	public static function getAllowedDomains(): ?array
 	{
 		return self::$allowedDomains ?? [];
+	}
+
+
+	/**
+	 * Converts IDN ASCII host to UTF-8.
+	 */
+	public static function idnHostToUnicode(string $host): string
+	{
+		if (strpos($host, '--') === false) { // host does not contain IDN
+			return $host;
+		}
+		if (function_exists('idn_to_utf8') && defined('INTL_IDNA_VARIANT_UTS46')) {
+			return idn_to_utf8($host, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46) ?: $host;
+		}
+		trigger_error('PHP extension idn is not loaded or is too old', E_USER_WARNING);
+
+		return $host;
 	}
 
 
@@ -91,15 +108,14 @@ final class Url
 		if (!isset($_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'])) {
 			throw new \RuntimeException('URL detection is not available in CLI mode.');
 		}
-		if (self::$allowedDomains === null || isset(self::$allowedDomains[$_SERVER['HTTP_HOST']]) === true) {
-			$domain = $_SERVER['HTTP_HOST'];
-		} else {
-			trigger_error('Domain "' . $_SERVER['HTTP_HOST'] . '" is not allowed in ["' . implode('", "', self::$allowedDomains) . '"].');
-			$domain = 'localhost';
+		$host = self::idnHostToUnicode(strtolower($_SERVER['HTTP_HOST']));
+		if (self::$allowedDomains !== null && isset(self::$allowedDomains[$host]) === false) {
+			trigger_error('Domain "' . $host . '" is not allowed in ["' . implode('", "', self::$allowedDomains) . '"].');
+			$host = 'localhost';
 		}
 
 		return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
-			. '://' . $domain . $_SERVER['REQUEST_URI'];
+			. '://' . $host . $_SERVER['REQUEST_URI'];
 	}
 
 
