@@ -10,6 +10,9 @@ use Nette\Http\UrlScript;
 
 final class Url
 {
+	/** @var array<string, string>|null */
+	private static ?array $allowedDomains = null;
+
 	private string $currentUrl;
 
 	private string $baseUrl;
@@ -43,6 +46,22 @@ final class Url
 	}
 
 
+	public static function addAllowedDomain(string $domain): void
+	{
+		$domain = strtolower($domain);
+		self::$allowedDomains[$domain] = $domain;
+	}
+
+
+	/**
+	 * @return array<string, string>
+	 */
+	public static function getAllowedDomains(): ?array
+	{
+		return self::$allowedDomains ?? [];
+	}
+
+
 	public function getCurrentUrl(): string
 	{
 		return $this->currentUrl;
@@ -72,9 +91,15 @@ final class Url
 		if (!isset($_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'])) {
 			throw new \RuntimeException('URL detection is not available in CLI mode.');
 		}
+		if (self::$allowedDomains === null || isset(self::$allowedDomains[$_SERVER['HTTP_HOST']]) === true) {
+			$domain = $_SERVER['HTTP_HOST'];
+		} else {
+			trigger_error('Domain "' . $_SERVER['HTTP_HOST'] . '" is not allowed in ["' . implode('", "', self::$allowedDomains) . '"].');
+			$domain = 'localhost';
+		}
 
 		return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
-			. '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+			. '://' . $domain . $_SERVER['REQUEST_URI'];
 	}
 
 
