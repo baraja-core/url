@@ -67,7 +67,7 @@ final class Url
 	 */
 	public static function idnHostToUnicode(string $host): string
 	{
-		if (strpos($host, '--') === false) { // host does not contain IDN
+		if (!str_contains($host, '--')) { // host does not contain IDN
 			return $host;
 		}
 		if (function_exists('idn_to_utf8') && defined('INTL_IDNA_VARIANT_UTS46')) {
