@@ -2,6 +2,7 @@
 	"name": "baraja-core/url",
 	"description": "Simple URL manager.",
 	"homepage": "https://github.com/baraja-core/url",
+	"license": "MIT",
 	"authors": [
 		{
 			"name": "Jan Barášek",
