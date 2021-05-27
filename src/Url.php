@@ -121,7 +121,10 @@ final class Url
 
 	private function getScriptPath(NetteUrl $url): string
 	{
-		if (($lowerPath = strtolower($path = $url->getPath())) !== ($script = strtolower($_SERVER['SCRIPT_NAME'] ?? ''))) {
+		$path = $url->getPath();
+		$lowerPath = strtolower($path);
+		$script = strtolower($_SERVER['SCRIPT_NAME'] ?? '');
+		if ($lowerPath !== $script) {
 			$max = min(strlen($lowerPath), strlen($script));
 			for ($i = 0; $i < $max && $lowerPath[$i] === $script[$i]; $i++) {
 				continue;
