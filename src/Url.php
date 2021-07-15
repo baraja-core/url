@@ -17,6 +17,8 @@ final class Url
 
 	private string $baseUrl;
 
+	private string $relativeUrl;
+
 	private NetteUrl $netteUrl;
 
 	private UrlScript $urlScript;
@@ -35,6 +37,7 @@ final class Url
 		$this->netteUrl = new NetteUrl($this->currentUrl);
 		$this->urlScript = new UrlScript($this->netteUrl, $this->getScriptPath($this->netteUrl));
 		$this->baseUrl = rtrim($this->urlScript->getBaseUrl(), '/');
+		$this->relativeUrl = ltrim($this->urlScript->getRelativeUrl(), '/');
 	}
 
 
@@ -88,6 +91,12 @@ final class Url
 	public function getBaseUrl(): string
 	{
 		return $this->baseUrl;
+	}
+
+
+	public function getRelativeUrl(): string
+	{
+		return $this->relativeUrl;
 	}
 
 
