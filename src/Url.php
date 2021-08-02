@@ -74,6 +74,7 @@ final class Url
 			return $host;
 		}
 		if (function_exists('idn_to_utf8') && defined('INTL_IDNA_VARIANT_UTS46')) {
+			/** @phpstan-ignore-next-line */
 			return idn_to_utf8($host, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46) ?: $host;
 		}
 		trigger_error('PHP extension idn is not loaded or is too old', E_USER_WARNING);
@@ -135,11 +136,12 @@ final class Url
 		$script = strtolower($_SERVER['SCRIPT_NAME'] ?? '');
 		if ($lowerPath !== $script) {
 			$max = min(strlen($lowerPath), strlen($script));
-			for ($i = 0; $i < $max && $lowerPath[$i] === $script[$i]; $i++) {
+			$i = 0;
+			for (; $i < $max && $lowerPath[$i] === $script[$i]; $i++) {
 				continue;
 			}
-			$path = $i
-				? substr($path, 0, strrpos($path, '/', $i - strlen($path) - 1) + 1)
+			$path = $i === 0
+				? substr($path, 0, ((int) strrpos($path, '/', $i - strlen($path) - 1)) + 1)
 				: '/';
 		}
 
