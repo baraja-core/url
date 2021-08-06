@@ -31,10 +31,20 @@ You will get the current URL:
 echo \Baraja\Url\Url::get()->getCurrentUrl();
 ```
 
-A base url:
+A base URL:
 
 ```php
 echo \Baraja\Url\Url::get()->getBaseUrl();
+```
+
+Or relative URL:
+
+```php
+// return with query parameters (if used)
+echo \Baraja\Url\Url::get()->getRelativeUrl();
+
+// return only path
+echo \Baraja\Url\Url::get()->getRelativeUrl(false);
 ```
 
 Nette Url or Script Url can also be obtained for robust work with URL parts:
