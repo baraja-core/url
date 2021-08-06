@@ -95,9 +95,11 @@ final class Url
 	}
 
 
-	public function getRelativeUrl(): string
+	public function getRelativeUrl(bool $withParameters = true): string
 	{
-		return $this->relativeUrl;
+		return $withParameters === true
+			? $this->relativeUrl
+			: (string) preg_replace('/^(.*)(\?.*)$/', '$1', $this->relativeUrl);
 	}
 
 
