@@ -142,7 +142,7 @@ final class Url
 			for (; $i < $max && $lowerPath[$i] === $script[$i]; $i++) {
 				continue;
 			}
-			$path = $i === 0
+			$path = $i !== 0
 				? substr($path, 0, ((int) strrpos($path, '/', $i - strlen($path) - 1)) + 1)
 				: '/';
 		}
