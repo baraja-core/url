@@ -125,9 +125,14 @@ final class Url
 			trigger_error('Domain "' . $host . '" is not allowed in ["' . implode('", "', self::$allowedDomains) . '"].');
 			$host = 'localhost';
 		}
+		$https =
+			(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+			|| (
+				isset($_SERVER['HTTP_X_FORWARDED_PROTO'])
+				&& strcasecmp($_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') === 0
+			);
 
-		return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
-			. '://' . $host . $_SERVER['REQUEST_URI'];
+		return ($https ? 'https' : 'http') . '://' . $host . $_SERVER['REQUEST_URI'];
 	}
 
 
