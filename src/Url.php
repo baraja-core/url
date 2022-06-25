@@ -74,8 +74,11 @@ final class Url
 			return $host;
 		}
 		if (function_exists('idn_to_utf8') && defined('INTL_IDNA_VARIANT_UTS46')) {
-			/** @phpstan-ignore-next-line */
-			return idn_to_utf8($host, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46) ?: $host;
+			$parts = explode(':', $host, 2);
+			$rewrittenHost = (string) idn_to_utf8($parts[0], IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
+			if ($rewrittenHost !== '') {
+				return $rewrittenHost . (isset($parts[1]) && $parts[1] !== '80' && $parts[1] !== '443' ? ':' . $parts[1] : '');
+			}
 		}
 		trigger_error('PHP extension idn is not loaded or is too old', E_USER_WARNING);
 
