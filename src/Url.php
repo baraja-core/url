@@ -123,9 +123,9 @@ final class Url
 		if (!isset($_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'])) {
 			throw new \RuntimeException('URL detection is not available in CLI mode.');
 		}
-		$host = self::idnHostToUnicode(strtolower($_SERVER['HTTP_HOST']));
+		$host = self::idnHostToUnicode(strtolower($_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST']));
 		if (self::$allowedDomains !== null && isset(self::$allowedDomains[$host]) === false) {
-			trigger_error('Domain "' . $host . '" is not allowed in ["' . implode('", "', self::$allowedDomains) . '"].');
+			trigger_error(sprintf('Domain "%s" is not allowed in ["%s"].', $host, implode('", "', self::$allowedDomains)));
 			$host = 'localhost';
 		}
 		$https =
